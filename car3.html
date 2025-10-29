@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tela de Carregamento - Clássico</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+        }
+
+        /* Orientação Horizontal */
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            width: 100vw;
+        }
+
+        .background-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        .parallax-layer {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-position: center bottom;
+        }
+
+        /* Camada mais distante, se move mais devagar */
+        .layer-back {
+            background-image: url('imag.png');
+            transform: scale(1.05); /* Zoom para o parallax */
+            animation: animateBack 90s linear infinite;
+        }
+
+        /* Camada do meio, se move em velocidade média */
+        .layer-middle {
+            background-image: url('imag2.png');
+            animation: animateMiddle 60s linear infinite;
+        }
+
+        /* Camada da frente, se move mais rápido e tem mais detalhes */
+        .layer-front {
+            background-image: url('imag3.png');
+            animation: animateFront 30s linear infinite;
+        }
+
+        .loading-overlay {
+            position: fixed;
+            bottom: 0; /* Posição fixa na parte inferior */
+            left: 0;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-bottom: 30px; /* Espaçamento da parte inferior da tela */
+            z-index: 2;
+            transition: opacity 0.5s ease;
+        }
+
+        /* Removi a classe .loading-content, agora os estilos ficam diretamente na barra e porcentagem */
+
+        .loading-bar-container {
+            width: 300px;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .loading-bar {
+            height: 100%;
+            background: #FFD700;
+            border-radius: 4px;
+            width: 0%;
+            transition: width 0.3s ease;
+            box-shadow: 0 0 8px rgba(255, 215, 0, 0.5);
+        }
+
+        .loading-percentage {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #FFD700;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+            margin-top: 10px;
+        }
+
+        .fade-out {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        @keyframes animateBack {
+            0% { background-position: 0% center; }
+            100% { background-position: 100% center; }
+        }
+
+        @keyframes animateMiddle {
+            0% { background-position: 0% center; }
+            100% { background-position: 100% center; }
+        }
+
+        @keyframes animateFront {
+            0% { background-position: 0% center; }
+            100% { background-position: 100% center; }
+        }
+
+        @media (max-width: 768px) {
+            .loading-bar-container {
+                width: 250px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="background-container">
+        <div class="parallax-layer layer-back"></div>
+        <div class="parallax-layer layer-middle"></div>
+        <div class="parallax-layer layer-front"></div>
+    </div>
+    
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-bar-container">
+            <div class="loading-bar" id="loadingBar"></div>
+        </div>
+        <div class="loading-percentage" id="loadingPercentage">0%</div>
+    </div>
+
+    <script>
+        const loadingProgress = document.getElementById('loadingBar');
+        const loadingPercentage = document.getElementById('loadingPercentage');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+
+        let currentProgress = 0;
+
+        function simulateLoading() {
+            const interval = setInterval(() => {
+                currentProgress += Math.random() * 5 + 1;
+                
+                if (currentProgress >= 100) {
+                    currentProgress = 100;
+                    clearInterval(interval);
+                    
+                    // Fazer o overlay desaparecer após 0.5 segundos
+                    setTimeout(() => {
+                        loadingOverlay.classList.add('fade-out');
+                    }, 500);
+
+                    // Redireciona para a página do jogo após 15 segundos de espera
+                    setTimeout(() => {
+                        window.location.href = 'game3.html';
+                    }, 3000); // 3000 milissegundos = 3 segundos
+                }
+                
+                loadingProgress.style.width = currentProgress + '%';
+                loadingPercentage.textContent = Math.floor(currentProgress) + '%';
+                
+            }, 200 + Math.random() * 300);
+        }
+
+        // A experiência de carregamento já é iniciada ao carregar a página
+        function startExperience() {
+            // Tenta colocar em tela cheia primeiro
+            if (document.documentElement.requestFullscreen) {
+                document.documentElement.requestFullscreen();
+            } else if (document.documentElement.webkitRequestFullscreen) { /* Safari */
+                document.documentElement.webkitRequestFullscreen();
+            }
+
+            // Tenta rotacionar a tela
+            if (screen.orientation && screen.orientation.lock) {
+                screen.orientation.lock('landscape').catch(function(error) {
+                    console.log('A rotação de tela falhou: ', error);
+                });
+            } else {
+                console.log('O navegador não suporta a rotação de tela.');
+            }
+
+            // Inicia a simulação de carregamento
+            simulateLoading();
+        }
+
+        // Inicia a experiência de carregamento automaticamente quando a página é carregada.
+        window.addEventListener('load', startExperience);
+    </script>
+</body>
+</html>
